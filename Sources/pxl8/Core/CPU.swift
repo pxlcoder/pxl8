@@ -55,6 +55,41 @@ class CPU
     func step()
     {
         print(String(format:"%04X", opcode))
+
+        let x = UInt8((opcode & 0x0F00) >> 8)
+        let y = UInt8((opcode & 0x00F0) >> 4)
+        let nn = UInt8(opcode & 0xFF)
+        let nnn = opcode & 0x0FFF
+
+        switch opcode & 0xF000 {
+            case 0x6000:
+                InstructionSet.CONST(self, x: x, nn: nn)
+            case 0x8000:
+                switch opcode & 0x000F {
+                    case 0x0000:
+                        InstructionSet.COPY(self, x: x, y: y)
+                    case 0x0001:
+                        InstructionSet.OR(self, x: x, y: y)
+                    case 0x0002:
+                        InstructionSet.AND(self, x: x, y: y)
+                    case 0x0003:
+                        InstructionSet.XOR(self, x: x, y: y)
+                    case 0x0004:
+                        InstructionSet.ADD(self, x: x, y: y)
+                    case 0x0005:
+                        InstructionSet.SUB(self, x: x, y: y)
+                    case 0x0006:
+                        InstructionSet.SHFTR(self, x: x, y: y)
+                    case 0x0007:
+                        InstructionSet.DIFF(self, x: x, y: y)
+                    case 0x000E:
+                        InstructionSet.SHFTL(self, x: x, y: y)
+                    default:
+                        print("Encountered unsupported opcode!")
+                }
+            default:
+                print("Encountered unsupported opcode!")
+        }
     }
 
     func incrementPC()
