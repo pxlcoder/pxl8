@@ -6,83 +6,122 @@
 //  Copyright © 2016 Aditya Keerthi. All rights reserved.
 //
 
+import Foundation
+
 class InstructionSet
 {
     // 0NNN - Calls RCA 1802 program at address NNN
-    func RCA(nnn: UInt16)
+    static func RCA(nnn: UInt16)
     {
         print("Warning! Not implemented.")
     }
     
     // 00E0 - Clears the screen
-    func CLR(_ cpu: CPU)
+    static func CLR(_ cpu: CPU)
     {
         for row in 0..<32 {
             for column in 0..<64 {
                 cpu.display[row][column] = 0
             }
         }
+        
+        cpu.pc += 2
     }
     
     // 00EE - Returns from a subroutine
     
     // 1NNN - Jumps to address NNN
+    static func JUMP(_ cpu: CPU, nnn: UInt16)
+    {
+        cpu.pc = nnn
+    }
     
     // 2NNN - Calls subroutine at NNN
     
     // 3XNN - Skips the next instruction if VX equals NN
+    static func SKPEQ(_ cpu: CPU, x: UInt8, nn: UInt8)
+    {
+        cpu.pc += 2
+        
+        if (cpu.V[x] == nn) {
+            cpu.pc += 2
+        }
+    }
     
     // 4XNN - Skips the next instruction if VX doesn't equal NN
+    static func SKPNE(_ cpu: CPU, x: UInt8, nn: UInt8)
+    {
+        cpu.pc += 2
+        
+        if (cpu.V[x] != nn) {
+            cpu.pc += 2
+        }
+    }
     
     // 5XY0 - Skips the next instruction if VX equals VY
+    static func SKPEQ(_ cpu: CPU, x: UInt8, y: UInt8)
+    {
+        cpu.pc += 2
+        
+        if (cpu.V[x] == cpu.V[y]) {
+            cpu.pc += 2
+        }
+    }
     
     // 6XNN - Sets VX to NN
-    
     static func CONST(_ cpu: CPU, x: UInt8, nn: UInt8)
     {
         cpu.V[x] = nn
+        cpu.pc += 2
     }
     
     // 7XNN - Adds NN to VX
+    static func ADD(_ cpu: CPU, x: UInt8, nn: UInt8)
+    {
+        cpu.V[x] = cpu.V[x] &+ nn
+        cpu.pc += 2
+    }
     
     // 8XY0 - Sets VX to the value of VY
-    
     static func COPY(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[y]
+        cpu.pc += 2
     }
     
     // 8XY1 - Sets VX to VX or VY
-    
     static func OR(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[x] | cpu.V[y]
+        cpu.pc += 2
     }
     
     // 8XY2 - Sets VX to VX and VY
-    
     static func AND(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[x] & cpu.V[y]
+        cpu.pc += 2
     }
     
     // 8XY3 - Sets VX to VX xor VY
-    
     static func XOR(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[x] ^ cpu.V[y]
+        cpu.pc += 2
     }
     
     // 8XY4 - Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
     static func ADD(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[x] &+ cpu.V[y]
+        cpu.pc += 2
     }
     
     // 8XY5 - VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     static func SUB(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[x] &- cpu.V[y]
+        cpu.pc += 2
     }
     
     // 8XY6 - Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
@@ -95,6 +134,7 @@ class InstructionSet
     static func DIFF(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         cpu.V[x] = cpu.V[y] &- cpu.V[x]
+        cpu.pc += 2
     }
     
     // 8XYE - Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
@@ -104,17 +144,69 @@ class InstructionSet
     }
     
     // 9XY0 - Skips the next instruction if VX doesn't equal VY
+    static func SKPNE(_ cpu: CPU, x: UInt8, y: UInt8)
+    {
+        cpu.pc += 2
+        
+        if (cpu.V[x] != cpu.V[y]) {
+            cpu.pc += 2
+        }
+    }
+    
     // ANNN - Sets I to the address NNN
+    static func SETI(_ cpu: CPU, nnn: UInt16)
+    {
+        cpu.I = nnn
+        cpu.pc += 2
+    }
+    
     // BNNN - Jumps to the address NNN plus V0
+    static func JUMPA(_ cpu: CPU, nnn: UInt16)
+    {
+        cpu.pc = UInt16(cpu.V[0]) &+ nnn
+    }
+    
     // CXNN - Sets VX to the result of a bitwise and operation on a random number and NN
+    static func RAND(_ cpu: CPU, x: UInt8, nn: UInt8)
+    {
+        cpu.V[x] = UInt8(arc4random_uniform(256)) & nn
+        cpu.pc += 2
+    }
+    
     // DXYN - Draws at sprite
     // EX9E - Skips the next instruction if the key stored in VX is pressed
     // EXA1 - Skips the next instruction if the key stored in VX isn't pressed
+    
     // FX07 - Sets VX to the value of the delay timer
+    static func LOADD(_ cpu: CPU, x: UInt8)
+    {
+        cpu.V[x] = cpu.delayTimer
+        cpu.pc += 2
+    }
+    
     // FX0A - A key press is awaited, and then stored in VX
+    
     // FX15 - Sets the delay timer to VX
+    static func DELAY(_ cpu: CPU, x: UInt8)
+    {
+        cpu.delayTimer = cpu.V[x]
+        cpu.pc += 2
+    }
+    
     // FX18 - Sets the sound timer to VX
+    static func SOUND(_ cpu: CPU, x: UInt8)
+    {
+        cpu.soundTimer = cpu.V[x]
+        cpu.pc += 2
+    }
+    
     // FX1E - Adds VX to I
+    static func ADDI(_ cpu: CPU, x: UInt8)
+    {
+        cpu.I = UInt16(x) &+ cpu.I
+        cpu.pc += 2
+    }
+    
     // FX29 - Sets I to the location of the sprite for the character in VX
     // FX33 - Stores the binary coded decimal representation of VX in I
     // FX55 - Stores V0 to VX in memory starting at address I

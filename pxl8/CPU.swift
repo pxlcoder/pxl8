@@ -64,14 +64,24 @@ class CPU
     {
         print(String(format:"%04X", opcode))
         
-        let x = UInt8((opcode & 0x0F00) >> 8)
-        let y = UInt8((opcode & 0x00F0) >> 4)
-        let nn = UInt8(opcode & 0xFF)
-        let nnn = opcode & 0x0FFF
+        let x: UInt8 = UInt8((opcode & 0x0F00) >> 8)
+        let y: UInt8 = UInt8((opcode & 0x00F0) >> 4)
+        let nn: UInt8 = UInt8(opcode & 0xFF)
+        let nnn: UInt16 = opcode & 0x0FFF
         
         switch opcode & 0xF000 {
+        case 0x1000:
+            InstructionSet.JUMP(self, nnn: nnn)
+        case 0x3000:
+            InstructionSet.SKPEQ(self, x: x, nn: nn)
+        case 0x4000:
+            InstructionSet.SKPNE(self, x: x, nn: nn)
+        case 0x5000:
+            InstructionSet.SKPEQ(self, x: x, y: y)
         case 0x6000:
             InstructionSet.CONST(self, x: x, nn: nn)
+        case 0x7000:
+            InstructionSet.ADD(self, x: x, nn: nn)
         case 0x8000:
             switch opcode & 0x000F {
             case 0x0000:
@@ -95,13 +105,16 @@ class CPU
             default:
                 print("Encountered unsupported opcode!")
             }
+        case 0x9000:
+            InstructionSet.SKPNE(self, x: x, y: y)
+        case 0xA000:
+            InstructionSet.SETI(self, nnn: nnn)
+        case 0xB000:
+            InstructionSet.JUMPA(self, nnn: nnn)
+        case 0xC000:
+            InstructionSet.RAND(self, x: x, nn: nn)
         default:
             print("Encountered unsupported opcode!")
         }
-    }
-    
-    func incrementPC()
-    {
-        pc += 2
     }
 }
