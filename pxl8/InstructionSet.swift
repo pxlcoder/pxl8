@@ -124,6 +124,12 @@ class InstructionSet
     // 8XY4 - Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
     static func ADD(_ cpu: CPU, x: UInt8, y: UInt8)
     {
+        if (cpu.V[x] > 255 - cpu.V[y]) {
+            cpu.V[0xF] = 1
+        } else {
+            cpu.V[0xF] = 0
+        }
+        
         cpu.V[x] = cpu.V[x] &+ cpu.V[y]
         cpu.pc += 2
     }
@@ -131,13 +137,23 @@ class InstructionSet
     // 8XY5 - VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     static func SUB(_ cpu: CPU, x: UInt8, y: UInt8)
     {
+        if (cpu.V[x] < cpu.V[y]) {
+            cpu.V[0xF] = 1
+        } else {
+            cpu.V[0xF] = 0
+        }
+        
         cpu.V[x] = cpu.V[x] &- cpu.V[y]
+        
         cpu.pc += 2
     }
     
     // 8XY6 - Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
     static func SHFTR(_ cpu: CPU, x: UInt8, y: UInt8)
     {
+        cpu.V[0xF] = cpu.V[x] & 0b00000001
+        
+        cpu.V[x] = cpu.V[x] >> 1
         
         cpu.pc += 2
     }
@@ -145,13 +161,23 @@ class InstructionSet
     // 8XY7 - Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
     static func DIFF(_ cpu: CPU, x: UInt8, y: UInt8)
     {
+        if (cpu.V[y] < cpu.V[x]) {
+            cpu.V[0xF] = 1
+        } else {
+            cpu.V[0xF] = 0
+        }
+        
         cpu.V[x] = cpu.V[y] &- cpu.V[x]
+        
         cpu.pc += 2
     }
     
     // 8XYE - Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
     static func SHFTL(_ cpu: CPU, x: UInt8, y: UInt8)
     {
+        cpu.V[0xF] = cpu.V[x] >> 7
+        
+        cpu.V[x] = cpu.V[x] << 1
         
         cpu.pc += 2
     }
