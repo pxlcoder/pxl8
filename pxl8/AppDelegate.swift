@@ -11,6 +11,8 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     let window = NSWindow()
+    let view = MainView()
+    let cpu = CPU()
 
     func applicationDidFinishLaunching(_ notification: Notification){
         NSApp.activate(ignoringOtherApps: true)
@@ -18,6 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.setContentSize(NSSize(width:64*5, height:32*5))
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.title = "pxl8"
+        window.contentView = view
         window.center()
         window.makeKeyAndOrderFront(window)
         
