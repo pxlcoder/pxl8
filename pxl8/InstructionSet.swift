@@ -139,6 +139,7 @@ class InstructionSet
     static func SHFTR(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         
+        cpu.pc += 2
     }
     
     // 8XY7 - Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
@@ -152,6 +153,7 @@ class InstructionSet
     static func SHFTL(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         
+        cpu.pc += 2
     }
     
     // 9XY0 - Skips the next instruction if VX doesn't equal VY
@@ -184,10 +186,32 @@ class InstructionSet
         cpu.pc += 2
     }
     
-    // DXYN - Draws at sprite
-    static func DRAW(_ cpu: CPU, x: UInt8, y: UInt8)
+    // DXYN - Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels
+    static func DRAW(_ cpu: CPU, x: UInt8, y: UInt8, n: UInt8)
     {
+        // Set VF flag to 0
+        cpu.V[15] = 0
         
+        for scany in 0..<n {
+            let pixels: UInt8 = cpu.memory[cpu.I + UInt16(scany)]
+            
+            for scanx: UInt8 in 0..<8 {
+                let pixel: UInt8 = (pixels & (0b1 << (7 - scanx))) >> (7 - scanx)
+                
+                if (pixel != 0) {
+                    let px = (scanx + cpu.V[x]) % 64
+                    let py = (scany + cpu.V[y]) % 32
+                    
+                    if (cpu.display[py][px] == 1) {
+                        cpu.V[15] = 1
+                    }
+                    
+                    cpu.display[py][px] ^= 1
+                }
+            }
+        }
+        
+        cpu.pc += 2
     }
     
     // EX9E - Skips the next instruction if the key stored in VX is pressed

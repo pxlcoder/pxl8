@@ -100,6 +100,7 @@ class CPU
         
         let x: UInt8 = UInt8((opcode & 0x0F00) >> 8)
         let y: UInt8 = UInt8((opcode & 0x00F0) >> 4)
+        let n: UInt8 = UInt8(opcode & 0x000F)
         let nn: UInt8 = UInt8(opcode & 0xFF)
         let nnn: UInt16 = opcode & 0x0FFF
         
@@ -158,6 +159,17 @@ class CPU
             InstructionSet.JUMPA(self, nnn: nnn)
         case 0xC000:
             InstructionSet.RAND(self, x: x, nn: nn)
+        case 0xD000:
+            InstructionSet.DRAW(self, x: x, y: y, n: n)
+        case 0xE000:
+            switch opcode & 0x00FF {
+            case 0x009E:
+                InstructionSet.KDOWN(self, x: x)
+            case 0x00A1:
+                InstructionSet.KUP(self, x: x)
+            default:
+                print("Encountered unsupported opcode!")
+            }
         case 0xF000:
             switch opcode & 0x00FF {
             case 0x0007:
