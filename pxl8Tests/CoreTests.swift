@@ -79,5 +79,23 @@ class CoreTests: XCTestCase {
         
         XCTAssertEqual(cpu.I, 3)
     }
+    
+    func testBCD()
+    {
+        let instructions: [UInt8] = [0x6A, 0xAB,    // Sets V[10] to 171 (AB)
+                                     0xAA, 0xAA,    // Sets I to the address AAA
+                                     0xFA, 0x33]    // Stores the BCD value of V[10] at I
+        
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertTrue(cpu.memory[cpu.I] == 1)
+        XCTAssertTrue(cpu.memory[cpu.I + 1] == 7)
+        XCTAssertTrue(cpu.memory[cpu.I + 2] == 1)
+    }
 
 }

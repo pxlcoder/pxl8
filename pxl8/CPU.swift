@@ -12,6 +12,7 @@ class CPU
 {
     static let MEM_SIZE = 4096
     static let PC_OFFSET = 512
+    static let FONT_SIZE = 5
     
     // 4K system memory
     internal var memory = [UInt8](repeating: 0, count: CPU.MEM_SIZE)
@@ -50,7 +51,33 @@ class CPU
     // TODO: Implement file open logic
     init()
     {
+        self.loadFontset()
         self.load(ROM: "/Users/akeerthi/Developer/pxl8/Resources/pong.rom")
+    }
+    
+    private func loadFontset()
+    {
+        let fontset: [UInt8] = [0xF0, 0x90, 0x90, 0x90, 0xF0,   // 0
+                                0x20, 0x60, 0x20, 0x20, 0x70,   // 1
+                                0xF0, 0x10, 0xF0, 0x80, 0xF0,   // 2
+                                0xF0, 0x10, 0xF0, 0x10, 0xF0,   // 3
+                                0x90, 0x90, 0xF0, 0x10, 0x10,   // 4
+                                0xF0, 0x80, 0xF0, 0x10, 0xF0,   // 5
+                                0xF0, 0x80, 0xF0, 0x90, 0xF0,   // 6
+                                0xF0, 0x10, 0x20, 0x40, 0x40,   // 7
+                                0xF0, 0x90, 0xF0, 0x90, 0xF0,   // 8
+                                0xF0, 0x90, 0xF0, 0x10, 0xF0,   // 9
+                                0xF0, 0x90, 0xF0, 0x90, 0x90,   // A
+                                0xE0, 0x90, 0xE0, 0x90, 0xE0,   // B
+                                0xF0, 0x80, 0x80, 0x80, 0xF0,   // C
+                                0xE0, 0x90, 0x90, 0x90, 0xE0,   // D
+                                0xF0, 0x80, 0xF0, 0x80, 0xF0,   // E
+                                0xF0, 0x80, 0xF0, 0x80, 0x80]   // F
+        
+        // Fontset loaded into memory beginning at zero
+        for i in 0..<(CPU.FONT_SIZE*16) {
+            memory[i] = fontset[i]
+        }
     }
     
     func load(ROM: String)
@@ -134,23 +161,23 @@ class CPU
         case 0xF000:
             switch opcode & 0x00FF {
             case 0x0007:
-                break
+                InstructionSet.LOADD(self, x: x)
             case 0x000A:
-                break
+                InstructionSet.KWAIT(self, x: x)
             case 0x0015:
-                break
+                InstructionSet.DELAY(self, x: x)
             case 0x0018:
-                break
+                InstructionSet.SOUND(self, x: x)
             case 0x001E:
                 InstructionSet.ADDI(self, x: x)
             case 0x0029:
-                break
+                InstructionSet.CHAR(self, x: x)
             case 0x0033:
-                break
+                InstructionSet.BCD(self, x: x)
             case 0x0055:
-                break
+                InstructionSet.STORE(self, x: x)
             case 0x0065:
-                break
+                InstructionSet.FILL(self, x: x)
             default:
                 print("Encountered unsupported opcode!")
             }

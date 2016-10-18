@@ -185,6 +185,11 @@ class InstructionSet
     }
     
     // DXYN - Draws at sprite
+    static func DRAW(_ cpu: CPU, x: UInt8, y: UInt8)
+    {
+        
+    }
+    
     // EX9E - Skips the next instruction if the key stored in VX is pressed
     static func KDOWN(_ cpu: CPU, x: UInt8)
     {
@@ -246,7 +251,44 @@ class InstructionSet
     }
     
     // FX29 - Sets I to the location of the sprite for the character in VX
+    static func CHAR(_ cpu: CPU, x: UInt8)
+    {
+        cpu.I = UInt16(cpu.V[x]) * UInt16(CPU.FONT_SIZE)
+        cpu.pc += 2
+    }
+    
     // FX33 - Stores the binary coded decimal representation of VX in I
+    static func BCD(_ cpu: CPU, x: UInt8)
+    {
+        // Hundreds digit
+        cpu.memory[cpu.I] = cpu.V[x] / 100
+        
+        // Tens digit
+        cpu.memory[cpu.I + 1] = (cpu.V[x] % 100) / 10
+        
+        // Units digit
+        cpu.memory[cpu.I + 2] = cpu.V[x] % 10
+        
+        cpu.pc += 2
+    }
+    
     // FX55 - Stores V0 to VX in memory starting at address I
+    static func STORE(_ cpu: CPU, x: UInt8)
+    {
+        for i in 0...x {
+            cpu.memory[cpu.I + UInt16(i)] = cpu.V[i]
+        }
+        
+        cpu.pc += 2
+    }
+    
     // FX65 - Fills V0 to VX with values from memory starting at address I
+    static func FILL(_ cpu: CPU, x: UInt8)
+    {
+        for i in 0...x {
+            cpu.V[i] = cpu.memory[cpu.I + UInt16(i)]
+        }
+        
+        cpu.pc += 2
+    }
 }
