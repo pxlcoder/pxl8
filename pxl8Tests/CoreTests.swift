@@ -28,8 +28,56 @@ class CoreTests: XCTestCase {
 
     func testStoreConstant()
     {
-        cpu.step()
+        let instructions: [UInt8] = [0x6A, 0x02]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+
         XCTAssertEqual(cpu.V[10], 2)
+    }
+    
+    func testAdd()
+    {
+        let instructions: [UInt8] = [0x71, 0x70]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertEqual(cpu.V[1], 112)
+    }
+    
+    func testStoreCopy()
+    {
+        let instructions: [UInt8] = [0x6B, 0x03,
+                                     0x81, 0xB0]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertEqual(cpu.V[1], 3)
+    }
+    
+    func testAddToI()
+    {
+        let instructions: [UInt8] = [0x6B, 0x03,
+                                     0xFB, 0x1E]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertEqual(cpu.I, 3)
     }
 
 }

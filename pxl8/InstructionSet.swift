@@ -29,6 +29,11 @@ class InstructionSet
     }
     
     // 00EE - Returns from a subroutine
+    static func RET(_ cpu: CPU)
+    {
+        cpu.sp -= 1
+        cpu.pc = cpu.stack[cpu.sp]
+    }
     
     // 1NNN - Jumps to address NNN
     static func JUMP(_ cpu: CPU, nnn: UInt16)
@@ -37,6 +42,12 @@ class InstructionSet
     }
     
     // 2NNN - Calls subroutine at NNN
+    static func CALL(_ cpu: CPU, nnn: UInt16)
+    {
+        cpu.stack[cpu.sp] = cpu.pc + 2
+        cpu.sp += 1
+        cpu.pc = nnn
+    }
     
     // 3XNN - Skips the next instruction if VX equals NN
     static func SKPEQ(_ cpu: CPU, x: UInt8, nn: UInt8)
@@ -203,7 +214,7 @@ class InstructionSet
     // FX1E - Adds VX to I
     static func ADDI(_ cpu: CPU, x: UInt8)
     {
-        cpu.I = UInt16(x) &+ cpu.I
+        cpu.I = UInt16(cpu.V[x]) &+ cpu.I
         cpu.pc += 2
     }
     

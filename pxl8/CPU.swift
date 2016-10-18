@@ -60,6 +60,13 @@ class CPU
         fclose(rom)
     }
     
+    func load(_ instructions: [UInt8])
+    {
+        for i in 0..<instructions.count {
+            memory[CPU.PC_OFFSET + i] = instructions[i]
+        }
+    }
+    
     func step()
     {
         print(String(format:"%04X", opcode))
@@ -70,8 +77,19 @@ class CPU
         let nnn: UInt16 = opcode & 0x0FFF
         
         switch opcode & 0xF000 {
+        case 0x0000:
+            switch opcode {
+            case 0x00E0:
+                InstructionSet.CLR(self)
+            case 0x00EE:
+                InstructionSet.RET(self)
+            default:
+                InstructionSet.RCA(nnn: nnn)
+            }
         case 0x1000:
             InstructionSet.JUMP(self, nnn: nnn)
+        case 0x2000:
+            InstructionSet.CALL(self, nnn: nnn)
         case 0x3000:
             InstructionSet.SKPEQ(self, x: x, nn: nn)
         case 0x4000:
@@ -113,6 +131,29 @@ class CPU
             InstructionSet.JUMPA(self, nnn: nnn)
         case 0xC000:
             InstructionSet.RAND(self, x: x, nn: nn)
+        case 0xF000:
+            switch opcode & 0x00FF {
+            case 0x0007:
+                break
+            case 0x000A:
+                break
+            case 0x0015:
+                break
+            case 0x0018:
+                break
+            case 0x001E:
+                InstructionSet.ADDI(self, x: x)
+            case 0x0029:
+                break
+            case 0x0033:
+                break
+            case 0x0055:
+                break
+            case 0x0065:
+                break
+            default:
+                print("Encountered unsupported opcode!")
+            }
         default:
             print("Encountered unsupported opcode!")
         }
