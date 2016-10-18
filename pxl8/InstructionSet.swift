@@ -186,7 +186,24 @@ class InstructionSet
     
     // DXYN - Draws at sprite
     // EX9E - Skips the next instruction if the key stored in VX is pressed
+    static func KDOWN(_ cpu: CPU, x: UInt8)
+    {
+        if (cpu.key[cpu.V[x]] != 0) {
+            cpu.pc += 2
+        }
+        
+        cpu.pc += 2
+    }
+    
     // EXA1 - Skips the next instruction if the key stored in VX isn't pressed
+    static func KUP(_ cpu: CPU, x: UInt8)
+    {
+        if (cpu.key[cpu.V[x]] == 0) {
+            cpu.pc += 2
+        }
+        
+        cpu.pc += 2
+    }
     
     // FX07 - Sets VX to the value of the delay timer
     static func LOADD(_ cpu: CPU, x: UInt8)
@@ -196,6 +213,16 @@ class InstructionSet
     }
     
     // FX0A - A key press is awaited, and then stored in VX
+    static func KWAIT(_ cpu: CPU, x: UInt8)
+    {
+        for key in 0..<cpu.key.count {
+            if (cpu.key[key] != 0) {
+                cpu.V[x] = UInt8(key)
+                cpu.pc += 2
+                return
+            }
+        }
+    }
     
     // FX15 - Sets the delay timer to VX
     static func DELAY(_ cpu: CPU, x: UInt8)
