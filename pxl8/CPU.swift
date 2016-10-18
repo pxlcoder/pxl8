@@ -30,6 +30,7 @@ class CPU
     
     // 64x32 display - 1 represents on, 0 represents off
     public var display = Array(repeating: [Int](repeating: 0, count: 64), count: 32)
+    public var updateDisplay = false
     
     // Two timer registers that count at 60 Hz
     internal var delayTimer: UInt8 = 0
@@ -91,6 +92,17 @@ class CPU
     {
         for i in 0..<instructions.count {
             memory[CPU.PC_OFFSET + i] = instructions[i]
+        }
+    }
+    
+    func updateClock()
+    {
+        if (delayTimer > 0) {
+            delayTimer -= 1
+        }
+        
+        if (soundTimer > 0) {
+            soundTimer -= 1
         }
     }
     
