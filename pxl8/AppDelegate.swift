@@ -34,22 +34,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(withTitle: "Load", action: #selector(load), keyEquivalent: "o")
         
         appMenu.addItem(NSMenuItem.separator())
-        appMenu.addItem(withTitle: "Hide pxl8", action: "hide:", keyEquivalent: "h")
+        appMenu.addItem(withTitle: "Hide pxl8", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
         
         appMenu.addItem(NSMenuItem.separator())
-        appMenu.addItem(withTitle: "Quit pxl8", action: "terminate:", keyEquivalent: "q")
+        appMenu.addItem(withTitle: "Quit pxl8", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         
         NSApplication.shared().mainMenu = mainMenu
-        
-        Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { Timer in
-            self.cpu.updateClock()
-            self.cpu.step()
-            
-            if (self.cpu.updateDisplay) {
-                self.cpu.updateDisplay = false
-                self.view.needsDisplay = true
-            }
-        }
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool
@@ -63,7 +53,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         fileBrowser.begin(completionHandler: { returnCode in
             if (returnCode == NSFileHandlingPanelOKButton) {
-
+                print(fileBrowser.url)
+                self.cpu.load(ROM: fileBrowser.url!.absoluteString.replacingOccurrences(of: "file:///", with: "/"))
+                
+                Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { Timer in
+                    self.cpu.updateClock()
+                    self.cpu.step()
+                    
+                    if (self.cpu.updateDisplay) {
+                        self.cpu.updateDisplay = false
+                        self.view.needsDisplay = true
+                    }
+                }
             }
         })
     }

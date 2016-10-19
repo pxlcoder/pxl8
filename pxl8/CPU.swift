@@ -53,7 +53,7 @@ class CPU
     init()
     {
         self.loadFontset()
-        self.load(ROM: "/Users/akeerthi/Developer/pxl8/Resources/invaders.rom")
+        //self.load(ROM: "/Users/akeerthi/Developer/pxl8/Resources/invaders.rom")
     }
     
     private func loadFontset()
