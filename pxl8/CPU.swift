@@ -31,6 +31,7 @@ class CPU
     // 64x32 display - 1 represents on, 0 represents off
     public var display = Array(repeating: [Int](repeating: 0, count: 64), count: 32)
     public var updateDisplay = false
+    public weak var screen: Display?
     
     // Two timer registers that count at 60 Hz
     internal var delayTimer: UInt8 = 0
@@ -49,11 +50,9 @@ class CPU
         return (UInt16(memory[pc]) << 8) | UInt16(memory[pc+1])
     }
     
-    // TODO: Implement file open logic
     init()
     {
         self.loadFontset()
-        //self.load(ROM: "/Users/akeerthi/Developer/pxl8/Resources/invaders.rom")
     }
     
     private func loadFontset()
@@ -81,6 +80,23 @@ class CPU
         }
     }
     
+    // Run loop
+    
+    func run()
+    {
+        Timer.scheduledTimer(withTimeInterval: 1.0/300.0, repeats: true) { Timer in
+            self.updateClock()
+            self.step()
+            
+            if (self.updateDisplay) {
+                self.updateDisplay = false
+                self.screen?.needsDisplay = true
+            }
+        }
+    }
+    
+    // Load from file
+    
     func load(ROM: String)
     {
         let rom = fopen(ROM, "r")
@@ -88,12 +104,16 @@ class CPU
         fclose(rom)
     }
     
+    // Load from array
+    
     func load(_ instructions: [UInt8])
     {
         for i in 0..<instructions.count {
             memory[CPU.PC_OFFSET + i] = instructions[i]
         }
     }
+    
+    // Update delay timer and sound timer
     
     func updateClock()
     {
@@ -106,10 +126,10 @@ class CPU
         }
     }
     
+    // Fetch and execute opcodes
+    
     func step()
     {
-        print(String(format:"%04X", opcode))
-        
         let x: UInt8 = UInt8((opcode & 0x0F00) >> 8)
         let y: UInt8 = UInt8((opcode & 0x00F0) >> 4)
         let n: UInt8 = UInt8(opcode & 0x000F)

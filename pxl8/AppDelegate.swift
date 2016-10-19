@@ -11,7 +11,7 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
 
     let window = NSWindow()
-    let view = MainView()
+    let display = Display()
     let cpu = CPU()
 
     func applicationDidFinishLaunching(_ notification: Notification){
@@ -20,9 +20,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.setContentSize(NSSize(width:64*5, height:32*5))
         window.styleMask = [.titled, .closable, .miniaturizable]
         window.title = "pxl8"
-        window.contentView = view
+        window.contentView = display
         window.center()
         window.makeKeyAndOrderFront(window)
+        
+        cpu.screen = display
         
         let mainMenu = NSMenu()
         let mainAppMenuItem = NSMenuItem(title: "pxl8", action: nil, keyEquivalent: "")
@@ -53,18 +55,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         fileBrowser.begin(completionHandler: { returnCode in
             if (returnCode == NSFileHandlingPanelOKButton) {
-                print(fileBrowser.url)
                 self.cpu.load(ROM: fileBrowser.url!.absoluteString.replacingOccurrences(of: "file:///", with: "/"))
-                
-                Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { Timer in
-                    self.cpu.updateClock()
-                    self.cpu.step()
-                    
-                    if (self.cpu.updateDisplay) {
-                        self.cpu.updateDisplay = false
-                        self.view.needsDisplay = true
-                    }
-                }
+                self.cpu.run()
             }
         })
     }
