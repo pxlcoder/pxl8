@@ -237,6 +237,8 @@ class InstructionSet
             }
         }
         
+        cpu.updateDisplay = true
+        
         cpu.pc += 2
     }
     

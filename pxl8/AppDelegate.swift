@@ -40,6 +40,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         appMenu.addItem(withTitle: "Quit pxl8", action: "terminate:", keyEquivalent: "q")
         
         NSApplication.shared().mainMenu = mainMenu
+        
+        Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { Timer in
+            self.cpu.updateClock()
+            self.cpu.step()
+            
+            if (self.cpu.updateDisplay) {
+                self.cpu.updateDisplay = false
+                self.view.needsDisplay = true
+            }
+        }
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool
