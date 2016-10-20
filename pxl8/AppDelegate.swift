@@ -33,7 +33,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let appMenu = NSMenu()
         mainAppMenuItem.submenu = appMenu
         
+        let recentItemsMenu = NSMenu()
+        let recentFilesMenuItem = NSMenuItem(title: "Load Recent", action: nil, keyEquivalent: "")
+        recentFilesMenuItem.submenu = recentItemsMenu
+        
         appMenu.addItem(withTitle: "Load", action: #selector(load), keyEquivalent: "o")
+        appMenu.addItem(recentFilesMenuItem)
         
         appMenu.addItem(NSMenuItem.separator())
         appMenu.addItem(withTitle: "Hide pxl8", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
@@ -55,8 +60,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         fileBrowser.begin(completionHandler: { returnCode in
             if (returnCode == NSFileHandlingPanelOKButton) {
-                self.cpu.load(ROM: fileBrowser.url!.absoluteString.replacingOccurrences(of: "file:///", with: "/"))
-                self.cpu.run()
+                if let fileURL = fileBrowser.url?.absoluteString.replacingOccurrences(of: "file:///", with: "/") {
+                    self.cpu.load(ROM: fileURL)
+                    self.cpu.run()
+                }
             }
         })
     }
