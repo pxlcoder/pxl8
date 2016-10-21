@@ -25,7 +25,31 @@ class CoreTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
+    
+    // 00E0 - Clears the screen
+    func testClearScreen()
+    {
+        let instructions: [UInt8] = [0x00, 0xE0]
+        cpu.load(instructions)
+        
+        cpu.display[0][0] = 1
+        cpu.display[25][49] = 1
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        for i in 0..<32
+        {
+            for j in 0..<64
+            {
+                XCTAssertTrue(cpu.display[i][j] == 0)
+            }
+        }
+    }
 
+    
     func testStoreConstant()
     {
         let instructions: [UInt8] = [0x6A, 0x02]

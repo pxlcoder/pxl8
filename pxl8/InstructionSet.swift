@@ -225,8 +225,8 @@ class InstructionSet
                 let pixel: UInt8 = (pixels & (0b1 << (7 - scanx))) >> (7 - scanx)
                 
                 if (pixel != 0) {
-                    let px = (scanx + cpu.V[x]) % 64
-                    let py = (scany + cpu.V[y]) % 32
+                    let px = (scanx &+ cpu.V[x]) % 64
+                    let py = (scany &+ cpu.V[y]) % 32
                     
                     if (cpu.display[py][px] == 1) {
                         cpu.V[15] = 1
