@@ -10,9 +10,11 @@ import Cocoa
 
 class CPU
 {
+    // Constants
     static let MEM_SIZE = 4096
     static let PC_OFFSET = 512
     static let FONT_SIZE = 5
+    static let CLOCK_SPEED = 120.0
     
     // 4K system memory
     internal var memory = [UInt8](repeating: 0, count: CPU.MEM_SIZE)
@@ -81,10 +83,9 @@ class CPU
     }
     
     // Run loop
-    
     func run()
     {
-        Timer.scheduledTimer(withTimeInterval: 1.0/300.0, repeats: true) { Timer in
+        Timer.scheduledTimer(withTimeInterval: 1.0/CPU.CLOCK_SPEED, repeats: true) { Timer in
             self.updateClock()
             self.step()
             
@@ -96,7 +97,6 @@ class CPU
     }
     
     // Load from file
-    
     func load(ROM: String)
     {
         let rom = fopen(ROM, "r")
@@ -105,7 +105,6 @@ class CPU
     }
     
     // Load from array
-    
     func load(_ instructions: [UInt8])
     {
         for i in 0..<instructions.count {
@@ -114,7 +113,6 @@ class CPU
     }
     
     // Update delay timer and sound timer
-    
     func updateClock()
     {
         if (delayTimer > 0) {
@@ -127,7 +125,6 @@ class CPU
     }
     
     // Fetch and execute opcodes
-    
     func step()
     {
         let x: UInt8 = UInt8((opcode & 0x0F00) >> 8)

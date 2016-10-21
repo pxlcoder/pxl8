@@ -18,7 +18,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
         
         window.setContentSize(NSSize(width:64*5, height:32*5))
-        window.styleMask = [.titled, .closable, .miniaturizable]
+        window.contentAspectRatio = NSSize(width: 64, height: 32)
+        window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.title = "pxl8"
         window.contentView = display
         window.center()
