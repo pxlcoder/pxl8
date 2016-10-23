@@ -8,6 +8,8 @@
 
 extension Array
 {
+    // Support subscripting via UInt8 and UInt16
+    
     subscript(index: UInt8) -> Element
         {
         get

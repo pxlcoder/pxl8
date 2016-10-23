@@ -16,16 +16,20 @@ class Display: NSView {
         return appDelegate.cpu
     }
     
-    private var keyMap: [UInt16: UInt8] = [18: 0x1, 19: 0x2, 20: 0x3, 21: 0xC,
-                                           12: 0x4, 13: 0x5, 14: 0x6, 15: 0xD,
-                                            0: 0x7,  1: 0x8,  2: 0x9,  3: 0xE,
-                                            6: 0xA,  7: 0x0,  8: 0xB,  9: 0xF]
+    // Keyboard
     
-    override var acceptsFirstResponder: Bool {
+    private var keyMap: [UInt16: UInt8] = [18: 0x1, 19: 0x2, 20: 0x3, 21: 0xC,  // 1, 2, 3, 4
+                                           12: 0x4, 13: 0x5, 14: 0x6, 15: 0xD,  // Q, W, E, R
+                                            0: 0x7,  1: 0x8,  2: 0x9,  3: 0xE,  // A, S, D, F
+                                            6: 0xA,  7: 0x0,  8: 0xB,  9: 0xF]  // Z, X, C, V
+    
+    override var acceptsFirstResponder: Bool
+    {
         return true
     }
     
-    override func keyDown(with event: NSEvent) {
+    override func keyDown(with event: NSEvent)
+    {
         let key = keyMap[event.keyCode]
         
         if let key = key {
@@ -33,15 +37,19 @@ class Display: NSView {
         }
     }
     
-    override func keyUp(with event: NSEvent) {
+    override func keyUp(with event: NSEvent)
+    {
         let key = keyMap[event.keyCode]
         
         if let key = key {
             cpu.key[key] = 0
         }
     }
+    
+    // Draw graphics on display
 
-    override func draw(_ dirtyRect: NSRect) {
+    override func draw(_ dirtyRect: NSRect)
+    {
         super.draw(dirtyRect)
 
         // Set background to black

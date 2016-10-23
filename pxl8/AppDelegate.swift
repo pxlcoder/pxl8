@@ -27,6 +27,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         cpu.screen = display
         
+        createMenu()
+    }
+    
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool
+    {
+        return true
+    }
+    
+    // Application menu
+    func createMenu()
+    {
         let mainMenu = NSMenu()
         let mainAppMenuItem = NSMenuItem(title: "pxl8", action: nil, keyEquivalent: "")
         mainMenu.addItem(mainAppMenuItem)
@@ -34,12 +45,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let appMenu = NSMenu()
         mainAppMenuItem.submenu = appMenu
         
-        let recentItemsMenu = NSMenu()
-        let recentFilesMenuItem = NSMenuItem(title: "Load Recent", action: nil, keyEquivalent: "")
-        recentFilesMenuItem.submenu = recentItemsMenu
-        
-        appMenu.addItem(withTitle: "Load", action: #selector(load), keyEquivalent: "o")
-        appMenu.addItem(recentFilesMenuItem)
+        appMenu.addItem(withTitle: "Load", action: #selector(openFile), keyEquivalent: "o")
         
         appMenu.addItem(NSMenuItem.separator())
         appMenu.addItem(withTitle: "Hide pxl8", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h")
@@ -50,18 +56,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared().mainMenu = mainMenu
     }
     
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool
-    {
-        return true
-    }
-    
-    func load()
+    // File open logic
+    func openFile()
     {
         let fileBrowser = NSOpenPanel()
         
         fileBrowser.begin(completionHandler: { returnCode in
             if (returnCode == NSFileHandlingPanelOKButton) {
-                if let fileURL = fileBrowser.url?.absoluteString.replacingOccurrences(of: "file:///", with: "/") {
+                if let fileURL = fileBrowser.url?.path {
                     self.cpu.load(ROM: fileURL)
                     self.cpu.run()
                 }

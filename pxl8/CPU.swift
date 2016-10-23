@@ -14,7 +14,7 @@ class CPU
     static let MEM_SIZE = 4096
     static let PC_OFFSET = 512
     static let FONT_SIZE = 5
-    static let CLOCK_SPEED = 120.0
+    static let CLOCK_SPEED = 60.0
     
     // 4K system memory
     internal var memory = [UInt8](repeating: 0, count: CPU.MEM_SIZE)
@@ -52,10 +52,7 @@ class CPU
         return (UInt16(memory[pc]) << 8) | UInt16(memory[pc+1])
     }
     
-    init()
-    {
-        self.loadFontset()
-    }
+    private var clock: Timer?
     
     private func loadFontset()
     {
@@ -85,8 +82,9 @@ class CPU
     // Run loop
     func run()
     {
-        Timer.scheduledTimer(withTimeInterval: 1.0/CPU.CLOCK_SPEED, repeats: true) { Timer in
-            self.updateClock()
+        clock?.invalidate()
+        clock = Timer.scheduledTimer(withTimeInterval: 1.0/CPU.CLOCK_SPEED, repeats: true) { Timer in
+            self.updateTimers()
             self.step()
             
             if (self.updateDisplay) {
@@ -99,6 +97,8 @@ class CPU
     // Load from file
     func load(ROM: String)
     {
+        reset()
+        
         let rom = fopen(ROM, "r")
         fread(&memory + CPU.PC_OFFSET, MemoryLayout<UInt8>.size, CPU.MEM_SIZE - CPU.PC_OFFSET, rom)
         fclose(rom)
@@ -107,13 +107,15 @@ class CPU
     // Load from array
     func load(_ instructions: [UInt8])
     {
+        reset()
+        
         for i in 0..<instructions.count {
             memory[CPU.PC_OFFSET + i] = instructions[i]
         }
     }
     
     // Update delay timer and sound timer
-    func updateClock()
+    func updateTimers()
     {
         if (delayTimer > 0) {
             delayTimer -= 1
@@ -225,5 +227,28 @@ class CPU
         default:
             print("Encountered unsupported opcode!")
         }
+    }
+    
+    // Reset contents of CPU
+    func reset()
+    {
+        memory = [UInt8](repeating: 0, count: CPU.MEM_SIZE)
+        V = [UInt8](repeating: 0, count: 16)
+        
+        I = 0
+        pc = UInt16(CPU.PC_OFFSET)
+        
+        display = Array(repeating: [Int](repeating: 0, count: 64), count: 32)
+        updateDisplay = false
+        
+        delayTimer = 0
+        soundTimer = 0
+        
+        stack = [UInt16](repeating:0, count: 16)
+        sp = 0
+        
+        key = [UInt8](repeating:0, count:16)
+        
+        self.loadFontset()
     }
 }
