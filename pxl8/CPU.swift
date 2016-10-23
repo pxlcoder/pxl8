@@ -139,30 +139,30 @@ class CPU
         case 0x0000:
             switch opcode {
             case 0x00E0:
-                InstructionSet.CLR(self)
+                InstructionSet.CLS(self)
             case 0x00EE:
                 InstructionSet.RET(self)
             default:
-                InstructionSet.RCA(nnn: nnn)
+                InstructionSet.SYS(nnn: nnn)
             }
         case 0x1000:
-            InstructionSet.JUMP(self, nnn: nnn)
+            InstructionSet.JMP(self, nnn: nnn)
         case 0x2000:
             InstructionSet.CALL(self, nnn: nnn)
         case 0x3000:
-            InstructionSet.SKPEQ(self, x: x, nn: nn)
+            InstructionSet.SKEQ(self, x: x, nn: nn)
         case 0x4000:
-            InstructionSet.SKPNE(self, x: x, nn: nn)
+            InstructionSet.SKNE(self, x: x, nn: nn)
         case 0x5000:
-            InstructionSet.SKPEQ(self, x: x, y: y)
+            InstructionSet.SKEQ(self, x: x, y: y)
         case 0x6000:
-            InstructionSet.CONST(self, x: x, nn: nn)
+            InstructionSet.MOV(self, x: x, nn: nn)
         case 0x7000:
             InstructionSet.ADD(self, x: x, nn: nn)
         case 0x8000:
             switch opcode & 0x000F {
             case 0x0000:
-                InstructionSet.COPY(self, x: x, y: y)
+                InstructionSet.MOV(self, x: x, y: y)
             case 0x0001:
                 InstructionSet.OR(self, x: x, y: y)
             case 0x0002:
@@ -174,47 +174,47 @@ class CPU
             case 0x0005:
                 InstructionSet.SUB(self, x: x, y: y)
             case 0x0006:
-                InstructionSet.SHFTR(self, x: x, y: y)
+                InstructionSet.SHR(self, x: x, y: y)
             case 0x0007:
-                InstructionSet.DIFF(self, x: x, y: y)
+                InstructionSet.SUBN(self, x: x, y: y)
             case 0x000E:
-                InstructionSet.SHFTL(self, x: x, y: y)
+                InstructionSet.SHL(self, x: x, y: y)
             default:
                 print("Encountered unsupported opcode!")
             }
         case 0x9000:
-            InstructionSet.SKPNE(self, x: x, y: y)
+            InstructionSet.SKNE(self, x: x, y: y)
         case 0xA000:
-            InstructionSet.SETI(self, nnn: nnn)
+            InstructionSet.MVI(self, nnn: nnn)
         case 0xB000:
-            InstructionSet.JUMPA(self, nnn: nnn)
+            InstructionSet.JMI(self, nnn: nnn)
         case 0xC000:
             InstructionSet.RAND(self, x: x, nn: nn)
         case 0xD000:
-            InstructionSet.DRAW(self, x: x, y: y, n: n)
+            InstructionSet.SPRITE(self, x: x, y: y, n: n)
         case 0xE000:
             switch opcode & 0x00FF {
             case 0x009E:
-                InstructionSet.KDOWN(self, x: x)
+                InstructionSet.SKP(self, x: x)
             case 0x00A1:
-                InstructionSet.KUP(self, x: x)
+                InstructionSet.SKNP(self, x: x)
             default:
                 print("Encountered unsupported opcode!")
             }
         case 0xF000:
             switch opcode & 0x00FF {
             case 0x0007:
-                InstructionSet.LOADD(self, x: x)
+                InstructionSet.GDELAY(self, x: x)
             case 0x000A:
-                InstructionSet.KWAIT(self, x: x)
+                InstructionSet.KEY(self, x: x)
             case 0x0015:
-                InstructionSet.DELAY(self, x: x)
+                InstructionSet.SDELAY(self, x: x)
             case 0x0018:
-                InstructionSet.SOUND(self, x: x)
+                InstructionSet.SSOUND(self, x: x)
             case 0x001E:
                 InstructionSet.ADDI(self, x: x)
             case 0x0029:
-                InstructionSet.CHAR(self, x: x)
+                InstructionSet.FONT(self, x: x)
             case 0x0033:
                 InstructionSet.BCD(self, x: x)
             case 0x0055:
