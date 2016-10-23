@@ -14,7 +14,8 @@ class CPU
     static let MEM_SIZE = 4096
     static let PC_OFFSET = 512
     static let FONT_SIZE = 5
-    static let CLOCK_SPEED = 60.0
+    static let CLOCK_SPEED = 480.0
+    static let TIMER_SPEED = 60.0
     
     // 4K system memory
     internal var memory = [UInt8](repeating: 0, count: CPU.MEM_SIZE)
@@ -53,6 +54,7 @@ class CPU
     }
     
     private var clock: Timer?
+    private var timer: Timer?
     
     private func loadFontset()
     {
@@ -82,9 +84,13 @@ class CPU
     // Run loop
     func run()
     {
+        timer?.invalidate()
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0/CPU.TIMER_SPEED, repeats: true) { Timer in
+            self.updateTimers()
+        }
+        
         clock?.invalidate()
         clock = Timer.scheduledTimer(withTimeInterval: 1.0/CPU.CLOCK_SPEED, repeats: true) { Timer in
-            self.updateTimers()
             self.step()
             
             if (self.updateDisplay) {

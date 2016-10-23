@@ -216,7 +216,7 @@ class InstructionSet
     static func SPRITE(_ cpu: CPU, x: UInt8, y: UInt8, n: UInt8)
     {
         // Set VF flag to 0
-        cpu.V[15] = 0
+        cpu.V[0xF] = 0
         
         for scany in 0..<n {
             let pixels: UInt8 = cpu.memory[cpu.I + UInt16(scany)]
@@ -229,7 +229,7 @@ class InstructionSet
                     let py = (scany &+ cpu.V[y]) % 32
                     
                     if (cpu.display[py][px] == 1) {
-                        cpu.V[15] = 1
+                        cpu.V[0xF] = 1
                     }
                     
                     cpu.display[py][px] ^= 1
