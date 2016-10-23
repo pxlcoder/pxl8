@@ -67,7 +67,7 @@ class Display: NSView {
             {
                 if cpu.display[row][column] != 0 {
                     let pixel = NSMakeRect(CGFloat(column) * pixelWidth,
-                                           self.bounds.size.height - CGFloat(row) * pixelHeight,
+                                           self.bounds.size.height - pixelHeight - CGFloat(row) * pixelHeight,
                                            pixelWidth,
                                            pixelHeight)
                     NSRectFill(pixel)
