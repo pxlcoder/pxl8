@@ -128,6 +128,7 @@ class CPU
         }
         
         if (soundTimer > 0) {
+            NSBeep()
             soundTimer -= 1
         }
     }
