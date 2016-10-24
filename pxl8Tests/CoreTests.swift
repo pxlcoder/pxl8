@@ -49,7 +49,6 @@ class CoreTests: XCTestCase {
         }
     }
 
-    
     func testStoreConstant()
     {
         let instructions: [UInt8] = [0x6A, 0x02]
@@ -74,6 +73,54 @@ class CoreTests: XCTestCase {
         }
         
         XCTAssertEqual(cpu.V[1], 112)
+    }
+    
+    func testAddOverflow()
+    {
+        let instructions: [UInt8] = [0x6B, 0x03,
+                                     0x6A, 0xFF,
+                                     0x8B, 0xA4]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertEqual(cpu.V[0xB], 2)
+        XCTAssertEqual(cpu.V[0xF], 1)
+    }
+    
+    func testSubOverflow()
+    {
+        let instructions: [UInt8] = [0x6B, 0x03,
+                                     0x6A, 0xFF,
+                                     0x8B, 0xA5]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertEqual(cpu.V[0xB], 4)
+        XCTAssertEqual(cpu.V[0xF], 0)
+    }
+    
+    func testSubnOverflow()
+    {
+        let instructions: [UInt8] = [0x6B, 0x03,
+                                     0x6A, 0xFF,
+                                     0x8A, 0xB7]
+        cpu.load(instructions)
+        
+        for _ in 0..<instructions.count/2
+        {
+            cpu.step()
+        }
+        
+        XCTAssertEqual(cpu.V[0xA], 4)
+        XCTAssertEqual(cpu.V[0xF], 0)
     }
     
     func testStoreCopy()

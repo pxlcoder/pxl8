@@ -138,9 +138,9 @@ class InstructionSet
     static func SUB(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         if (cpu.V[x] < cpu.V[y]) {
-            cpu.V[0xF] = 1
-        } else {
             cpu.V[0xF] = 0
+        } else {
+            cpu.V[0xF] = 1
         }
         
         cpu.V[x] = cpu.V[x] &- cpu.V[y]
@@ -162,9 +162,9 @@ class InstructionSet
     static func SUBN(_ cpu: CPU, x: UInt8, y: UInt8)
     {
         if (cpu.V[y] < cpu.V[x]) {
-            cpu.V[0xF] = 1
-        } else {
             cpu.V[0xF] = 0
+        } else {
+            cpu.V[0xF] = 1
         }
         
         cpu.V[x] = cpu.V[y] &- cpu.V[x]
